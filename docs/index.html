@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Agricultural Production vs Climate Maps in Ohio</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            /* background-color: black; */
+        }
+
+        * {
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+        }
+
+        .main-title {
+            text-align: center;
+            display: flex;
+            height: 50px;
+            color: Black;
+            font-family: Helvetica, Arial, sans-serif;
+            font-weight: bold;
+            font-size: large;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title {
+            text-align: center;
+            height: 30px;
+            color: white;
+            font-family: serif;
+            font-weight: bold;
+            font-size: medium;
+        }
+
+        .legendDiv {
+            width: 20%;
+            height: calc(100% - 50px);
+            float: left;
+            padding: 5px;
+            border: 1px;
+            border-color: rgb(94, 94, 94);
+            border-style: dashed;
+            background-color: black;
+        }
+
+        .mainMapDiv {
+            width: 50%;
+            height: calc(100% - 50px);
+            float: left;
+            padding: 5px;
+            border: 1px;
+            border-color: rgb(94, 94, 94);
+            border-style: dashed;
+            background-color: black;
+        }
+
+        .tempDiv,
+        .preDiv {
+            width: 30%;
+            height: calc((100% - 50px)/2);
+            float: left;
+            padding: 5px;
+            border: 1px;
+            border-color: rgb(94, 94, 94);
+            border-style: dashed;
+            background-color: black;
+        }
+
+        #legendView,
+        #mainMapView,
+        #tempView,
+        #preView {
+            height: calc(100% - 30px);
+        }
+    </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.28/"></script>
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/GeoJSONLayer",
+            "esri/widgets/LayerList",
+            "esri/widgets/ScaleBar"
+        ], function (Map, MapView, GeoJSONLayer, LayerList, ScaleBar) {
+            const map = new Map({
+                basemap: "dark-gray"
+            });
+
+            const main_view = new MapView({
+                container: "mainMapView",
+                map: map,
+                zoom: 6,
+                center: [-82.883737, 40.182282]
+            });
+            const scalebar1 = new ScaleBar({
+                view: main_view
+            });
+            main_view.ui.add(scalebar1, { position: "bottom-left" });
+
+            const corn_map = new GeoJSONLayer({
+                copyright: "USDA",
+                url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
+                title: "Corn production",
+                outFields: ["County", "Corn"],
+                popupTemplate: {
+                    title: "{County}",
+                    content: "{Corn} Bu corn in 2022."
+                },
+                renderer: {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-fill",
+                        outline: {
+                            color: "lightgray",
+                            width: 0.5
+                        }
+                    },
+                    visualVariables: [{
+                        type: "color",
+                        field: "Corn",
+                        normalizationType: "percent-of-total",
+                        normalizationTotal: 584818700,
+                        stops: [{
+                            value: 0,
+                            color: "#424242"
+                        }, {
+                            value: 70399,
+                            color: "#424242"
+                        }, {
+                            value: 70400,
+                            color: "#F4F269"
+                        }, {
+                            value: 23997000,
+                            color: "#5CB270"
+                        }]
+                    }]
+                }
+            });
+            map.add(corn_map);
+
+            const soy_map = new GeoJSONLayer({
+                copyright: "USDA",
+                url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
+                title: "Soybean production",
+                outFields: ["County", "Soybean"],
+                popupTemplate: {
+                    title: "{County}",
+                    content: "{Soybean} Bu soybean in 2022."
+                },
+                renderer: {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-fill",
+                        outline: {
+                            color: "lightgray",
+                            width: 0.5
+                        }
+                    },
+                    visualVariables: [{
+                        type: "color",
+                        field: "Soybean",
+                        normalizationType: "percent-of-total",
+                        normalizationTotal: 274958100,
+                        stops: [{
+                            value: 0,
+                            color: "#424242"
+                        }, {
+                            value: 22799,
+                            color: "#424242"
+                        }, {
+                            value: 22800,
+                            color: "#ecf39e"
+                        }, {
+                            value: 9457000,
+                            color: "#132a13"
+                        }]
+                    }]
+                }
+            });
+            map.add(soy_map);
+
+            const wheat_map = new GeoJSONLayer({
+                copyright: "USDA",
+                url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
+                title: "Winter wheat production",
+                outFields: ["County", "Wheat"],
+                popupTemplate: {
+                    title: "{County}",
+                    content: "{Wheat}Bu winter wheat in 2022."
+                },
+                renderer: {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-fill",
+                        outline: {
+                            color: "lightgray",
+                            width: 0.5
+                        }
+                    },
+                    visualVariables: [{
+                        type: "color",
+                        field: "Wheat",
+                        normalizationType: "percent-of-total",
+                        normalizationTotal: 29381500,
+                        stops: [{
+                            value: 0,
+                            color: "#424242"
+                        }, {
+                            value: 14199,
+                            color: "#424242"
+                        }, {
+                            value: 14200,
+                            color: "#fedc97"
+                        }, {
+                            value: 1912000,
+                            color: "#033f63"
+                        }]
+                    }]
+                }
+            });
+            map.add(wheat_map);
+
+            const temp_map = new Map({
+                basemap: "dark-gray"
+            });
+            const temp_view = new MapView({
+                container: "tempView",
+                map: temp_map,
+                zoom: 5,
+                center: [-82.883737, 40.182282]
+            });
+            const scalebar2 = new ScaleBar({
+                view: temp_view
+            });
+            temp_view.ui.add(scalebar2, { position: "bottom-left" });
+            const t_map = new GeoJSONLayer({
+                copyright: "NOAA",
+                url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
+                title: "Average temperature (°F)",
+                outFields: ["County", "Temp"],
+                popupTemplate: {
+                    title: "{County}",
+                    content: "{Temp}20&deg;F average temperature in 2022."
+                },
+                renderer: {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-fill",
+                        outline: {
+                            color: "lightgray",
+                            width: 0.5
+                        }
+                    },
+                    visualVariables: [{
+                        type: "color",
+                        field: "Temp",
+                        stops: [{
+                            value: 49.5,
+                            color: "#364958"
+                        }, {
+                            value: 54.6,
+                            color: "#c9e4ca"
+                        }]
+                    }]
+                }
+            });
+            temp_map.add(t_map);
+
+            const pre_map = new Map({
+                basemap: "dark-gray"
+            });
+            const pre_view = new MapView({
+                container: "preView",
+                map: pre_map,
+                zoom: 5,
+                center: [-82.883737, 40.182282]
+            });
+            const scalebar3 = new ScaleBar({
+                view: pre_view
+            });
+            pre_view.ui.add(scalebar3, { position: "bottom-left" });
+            const p_map = new GeoJSONLayer({
+                copyright: "NOAA",
+                url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
+                title: "Precipitation (inches)",
+                outFields: ["County", "Precipitation"],
+                popupTemplate: {
+                    title: "{County}",
+                    content: "{Precipitation} Inches precipitation in 2022."
+                },
+                renderer: {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-fill",
+                        outline: {
+                            color: "lightgray",
+                            width: 0.5
+                        }
+                    },
+                    visualVariables: [{
+                        type: "color",
+                        field: "Precipitation",
+                        stops: [{
+                            value: 27.36,
+                            color: "#ddd8c4"
+                        }, {
+                            value: 50.17,
+                            color: "#50808e"
+                        }]
+                    }]
+                }
+            });
+            pre_map.add(p_map);
+
+            //layerlists
+            var layer_list = new LayerList({
+                container: "legendView",
+                view: main_view,
+                listItemCreatedFunction: function (event) {
+                    const item = event.item;
+                    if (item.layer.type != "group") {
+                        item.panel = {
+                            content: "legend",
+                            open: true
+                        };
+                    }
+                }
+            });
+            var layer_list2 = new LayerList({
+                container: "legendView",
+                view: temp_view,
+                listItemCreatedFunction: function (event) {
+                    const item = event.item;
+                    if (item.layer.type != "group") {
+                        item.panel = {
+                            content: "legend",
+                            open: true
+                        };
+                    }
+                }
+            });
+            var layer_list3 = new LayerList({
+                container: "legendView",
+                view: pre_view,
+                listItemCreatedFunction: function (event) {
+                    const item = event.item;
+                    if (item.layer.type != "group") {
+                        item.panel = {
+                            content: "legend",
+                            open: true
+                        };
+                    }
+                }
+            });
+
+            //sync views
+            const views = [main_view, temp_view, pre_view];
+            let active;
+            const sync = (source) => {
+                if (!active || !active.viewpoint || active !== source) {
+                    return;
+                }
+                for (const view of views) {
+                    if (view !== active) {
+                        view.viewpoint = active.viewpoint;
+                    }
+                }
+            };
+            for (const view of views) {
+                view.watch(["interacting", "animation"], () => {
+                    active = view;
+                    sync(active);
+                });
+                view.watch("viewpoint", () => {
+                    sync(view);
+                });
+            }
+        });
+    </script>
+</head>
+
+<body>
+
+    <div class="main-title">Agricultural Production vs Climate Maps in Ohio, 2022</div>
+
+    <div class="legendDiv">
+        <div class="title">Legend</div>
+        <div id="legendView">
+        </div>
+    </div>
+
+    <div class="mainMapDiv">
+        <div class="title">Agricultural Production</div>
+        <div id="mainMapView">
+        </div>
+    </div>
+
+    <div class="tempDiv">
+        <div class="title">Average Temperature</div>
+        <div id="tempView">
+        </div>
+    </div>
+
+    <div class="preDiv">
+        <div class="title">Precipitation</div>
+        <div id="preView">
+        </div>
+    </div>
+
+</body>
+
+</html>
