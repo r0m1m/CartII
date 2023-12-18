@@ -92,9 +92,10 @@
             "esri/Map",
             "esri/views/MapView",
             "esri/layers/GeoJSONLayer",
+            "esri/layers/ImageryLayer",
             "esri/widgets/LayerList",
             "esri/widgets/ScaleBar"
-        ], function (Map, MapView, GeoJSONLayer, LayerList, ScaleBar) {
+        ], function (Map, MapView, GeoJSONLayer, ImageryLayer, LayerList, ScaleBar) {
 
             const cornMap = new Map({
                 basemap: "dark-gray"
@@ -316,38 +317,27 @@
                 view: temp_view
             });
             temp_view.ui.add(scalebar4, { position: "bottom-left" });
-            const t_map = new GeoJSONLayer({
-                copyright: "NOAA",
+            const t_map = new ImageryLayer({
+                url: "https://apps.fs.usda.gov/fsgisx01/rest/services/RDW_Climate/AvgAnnualTempHistorical1975_2005_CONUS/ImageServer",
+                title: "Average annual temperature (1975-2005)"
+            });
+            const t_county = new GeoJSONLayer({
                 url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
-                title: "Average temperature (°F)",
-                outFields: ["County", "Temp"],
+                title: "Counties",
                 popupTemplate: {
-                    title: "{County}",
-                    content: "{Temp}20&deg;F average temperature in 2022."
+                    title: "{County}"
                 },
                 renderer: {
                     type: "simple",
                     symbol: {
-                        type: "simple-fill",
-                        outline: {
-                            color: "lightgray",
-                            width: 0.5
-                        }
-                    },
-                    visualVariables: [{
-                        type: "color",
-                        field: "Temp",
-                        stops: [{
-                            value: 49.5,
-                            color: "#364958"
-                        }, {
-                            value: 54.6,
-                            color: "#c9e4ca"
-                        }]
-                    }]
+                        type: "simple-line",
+                        color: "black",
+                        width: 0.25
+                    }
                 }
             });
             temp_map.add(t_map);
+            temp_map.add(t_county);
 
             const pre_map = new Map({
                 basemap: "dark-gray"
@@ -362,38 +352,27 @@
                 view: pre_view
             });
             pre_view.ui.add(scalebar5, { position: "bottom-left" });
-            const p_map = new GeoJSONLayer({
-                copyright: "NOAA",
+            const p_map = new ImageryLayer ({
+                url: "https://apps.fs.usda.gov/fsgisx01/rest/services/RDW_Climate/AvgAnnualPrecipHistorical1975_2005_CONUS/ImageServer",
+                title: "Average annual precipitation (1975-2005)"
+            });
+            const p_county = new GeoJSONLayer({
                 url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
-                title: "Precipitation (inches)",
-                outFields: ["County", "Precipitation"],
+                title: "Counties",
                 popupTemplate: {
-                    title: "{County}",
-                    content: "{Precipitation} Inches precipitation in 2022."
+                    title: "{County}"
                 },
                 renderer: {
                     type: "simple",
                     symbol: {
-                        type: "simple-fill",
-                        outline: {
-                            color: "lightgray",
-                            width: 0.5
-                        }
-                    },
-                    visualVariables: [{
-                        type: "color",
-                        field: "Precipitation",
-                        stops: [{
-                            value: 27.36,
-                            color: "#ddd8c4"
-                        }, {
-                            value: 50.17,
-                            color: "#50808e"
-                        }]
-                    }]
+                        type: "simple-line",
+                        color: "black",
+                        width: 0.25
+                    }
                 }
             });
             pre_map.add(p_map);
+            pre_map.add(p_county);
 
             //layerlists
             const views = [corn_view, soybean_view, wheat_view, temp_view, pre_view];
