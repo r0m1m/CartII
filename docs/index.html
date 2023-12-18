@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Agricultural Production vs Climate Maps in Ohio</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kalnia">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium Web">
     <style>
         html,
         body {
@@ -24,9 +26,10 @@
             display: flex;
             height: 50px;
             color: Black;
-            font-family: Helvetica, Arial, sans-serif;
+            background-color: #cb997e;
+            font-family: Kalnia;
             font-weight: bold;
-            font-size: large;
+            font-size: larger;
             align-items: center;
             justify-content: center;
         }
@@ -35,9 +38,10 @@
             text-align: center;
             height: 30px;
             color: white;
-            font-family: serif;
+            font-family: Titillium Web;
             font-weight: bold;
             font-size: medium;
+            background-color: #b75d69;
         }
 
         .legendDiv {
@@ -94,8 +98,9 @@
             "esri/layers/GeoJSONLayer",
             "esri/layers/ImageryLayer",
             "esri/widgets/LayerList",
-            "esri/widgets/ScaleBar"
-        ], function (Map, MapView, GeoJSONLayer, ImageryLayer, LayerList, ScaleBar) {
+            "esri/widgets/ScaleBar",
+            "esri/widgets/Swipe"
+        ], function (Map, MapView, GeoJSONLayer, ImageryLayer, LayerList, ScaleBar, Swipe) {
 
             const cornMap = new Map({
                 basemap: "dark-gray"
@@ -124,18 +129,18 @@
                 }
             };
 
-            const corn_map = new GeoJSONLayer({
+            const corn_map_22 = new GeoJSONLayer({
                 copyright: "USDA",
-                url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
-                title: "Corn production",
-                outFields: ["County", "Corn"],
+                url: "https://dl.dropbox.com/scl/fi/n8z1k9nkcobbig74nhwzu/dataset.json?rlkey=nrgjo3tdzga8hethmkac8iayo&dl=0",
+                title: "Corn production 2022",
+                outFields: ["County", "Corn_22"],
                 popupTemplate: {
                     title: "{County}",
-                    content: "{Corn} Bu corn in 2022."
+                    content: "{Corn_22} Bu corn in 2022."
                 },
                 renderer: {
                     type: "class-breaks",
-                    field: "Corn",
+                    field: "Corn_22",
                     legendOptions: {
                         title: "Corn production (Bu), 2022"
                     },
@@ -152,27 +157,83 @@
                     classBreakInfos: [{
                         minValue: 70400,
                         maxValue: 1988000,
-                        symbol: get_symbol("#eeef20"),
+                        symbol: get_symbol("#e0d68a"),
                         label: "70,400 - 1,988,000"
                     }, {
                         minValue: 1988001,
                         maxValue: 6320000,
-                        symbol: get_symbol("#80b918"),
+                        symbol: get_symbol("#cb9173"),
                         label: "1,988,001 - 6,320,000"
                     }, {
                         minValue: 6320001,
                         maxValue: 12472000,
-                        symbol: get_symbol("#55a630"),
+                        symbol: get_symbol("#8e443d"),
                         label: "6,320,001 - 1,247,2000"
                     }, {
                         minValue: 12472001,
                         maxValue: 23997000,
-                        symbol: get_symbol("#007f5f"),
+                        symbol: get_symbol("#511730"),
                         label: "12,472,001 - 23,997,000"
                     }]
                 }
             });
-            cornMap.add(corn_map);
+            const corn_map_21 = new GeoJSONLayer({
+                copyright: "USDA",
+                url: "https://dl.dropbox.com/scl/fi/n8z1k9nkcobbig74nhwzu/dataset.json?rlkey=nrgjo3tdzga8hethmkac8iayo&dl=0",
+                title: "Corn production 2021",
+                outFields: ["County", "Corn_21"],
+                popupTemplate: {
+                    title: "{County}",
+                    content: "{Corn_21} Bu corn in 2021."
+                },
+                renderer: {
+                    type: "class-breaks",
+                    field: "Corn_21",
+                    legendOptions: {
+                        title: "Corn production (Bu), 2021"
+                    },
+                    defaultSymbol: {
+                        type: "simple-fill",
+                        color: [255, 255, 255, 0.5],
+                        style: "backward-diagonal",
+                        outline: {
+                            width: 0.5,
+                            color: [255, 255, 255, 0.5]
+                        }
+                    },
+                    defaultLabel: "No data",
+                    classBreakInfos: [{
+                        minValue: 45000,
+                        maxValue: 1591000,
+                        symbol: get_symbol("#e0d68a"),
+                        label: "45,000 - 1,591,000"
+                    }, {
+                        minValue: 1591001,
+                        maxValue: 6775000,
+                        symbol: get_symbol("#cb9173"),
+                        label: "1,591,001 - 6,775,000"
+                    }, {
+                        minValue: 6775001,
+                        maxValue: 13000000,
+                        symbol: get_symbol("#8e443d"),
+                        label: "6,775,001 - 13,000,000"
+                    }, {
+                        minValue: 13000001,
+                        maxValue: 22811000,
+                        symbol: get_symbol("#511730"),
+                        label: "13,000,001 - 22,811,000"
+                    }]
+                }
+            });
+            cornMap.add(corn_map_22);
+            cornMap.add(corn_map_21);
+            const cornSwipe = new Swipe({
+                leadingLayers: [corn_map_21],
+                trailingLayers: [corn_map_22],
+                position: 30,
+                view: corn_view
+            });
+            corn_view.ui.add(cornSwipe);
 
             const soybeanMap = new Map({
                 basemap: "dark-gray"
@@ -189,18 +250,18 @@
             });
             soybean_view.ui.add(scalebar2, { position: "bottom-left" });
 
-            const soy_map = new GeoJSONLayer({
+            const soy_map_22 = new GeoJSONLayer({
                 copyright: "USDA",
-                url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
-                title: "Soybean production",
-                outFields: ["County", "Soybean"],
+                url: "https://dl.dropbox.com/scl/fi/n8z1k9nkcobbig74nhwzu/dataset.json?rlkey=nrgjo3tdzga8hethmkac8iayo&dl=0",
+                title: "Soybean production 2022",
+                outFields: ["County", "Soybean_22"],
                 popupTemplate: {
                     title: "{County}",
-                    content: "{Soybean} Bu soybean in 2022."
+                    content: "{Soybean_22} Bu soybean in 2022."
                 },
                 renderer: {
                     type: "class-breaks",
-                    field: "Soybean",
+                    field: "Soybean_22",
                     legendOptions: {
                         title: "Soybean production (Bu), 2022"
                     },
@@ -237,7 +298,63 @@
                     }]
                 }
             });
-            soybeanMap.add(soy_map);
+            const soy_map_21 = new GeoJSONLayer({
+                copyright: "USDA",
+                url: "https://dl.dropbox.com/scl/fi/n8z1k9nkcobbig74nhwzu/dataset.json?rlkey=nrgjo3tdzga8hethmkac8iayo&dl=0",
+                title: "Soybean production 2021",
+                outFields: ["County", "Soybean_21"],
+                popupTemplate: {
+                    title: "{County}",
+                    content: "{Soybean_21} Bu soybean in 2021."
+                },
+                renderer: {
+                    type: "class-breaks",
+                    field: "Soybean_21",
+                    legendOptions: {
+                        title: "Soybean production (Bu), 2021"
+                    },
+                    defaultSymbol: {
+                        type: "simple-fill",
+                        color: [255, 255, 255, 0.5],
+                        style: "backward-diagonal",
+                        outline: {
+                            width: 0.5,
+                            color: [255, 255, 255, 0.5]
+                        }
+                    },
+                    defaultLabel: "No data",
+                    classBreakInfos: [{
+                        minValue: 40600,
+                        maxValue: 1085000,
+                        symbol: get_symbol("#eec170"),
+                        label: "40,600 - 1,085,000"
+                    }, {
+                        minValue: 1085001,
+                        maxValue: 3466000,
+                        symbol: get_symbol("#f2a65a"),
+                        label: "1,085,001 - 3,466,000"
+                    }, {
+                        minValue: 3466001,
+                        maxValue: 5930000,
+                        symbol: get_symbol("#f58549"),
+                        label: "3,466,001 - 5,930,000"
+                    }, {
+                        minValue: 5930001,
+                        maxValue: 8740000,
+                        symbol: get_symbol("#c44536"),
+                        label: "5,930,001 - 8,740,000"
+                    }]
+                }
+            });
+            soybeanMap.add(soy_map_22);
+            soybeanMap.add(soy_map_21);
+            const soybeanSwipe = new Swipe({
+                leadingLayers: [soy_map_21],
+                trailingLayers: [soy_map_22],
+                position: 30,
+                view: soybean_view
+            });
+            soybean_view.ui.add(soybeanSwipe);
 
             const wheatMap = new Map({
                 basemap: "dark-gray"
@@ -254,18 +371,18 @@
             });
             wheat_view.ui.add(scalebar3, { position: "bottom-left" });
 
-            const wheat_map = new GeoJSONLayer({
+            const wheat_map_22 = new GeoJSONLayer({
                 copyright: "USDA",
-                url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
-                title: "Winter wheat production",
-                outFields: ["County", "Wheat"],
+                url: "https://dl.dropbox.com/scl/fi/n8z1k9nkcobbig74nhwzu/dataset.json?rlkey=nrgjo3tdzga8hethmkac8iayo&dl=0",
+                title: "Winter wheat production 2022",
+                outFields: ["County", "Wheat_22"],
                 popupTemplate: {
                     title: "{County}",
-                    content: "{Wheat} Bu winter wheat in 2022."
+                    content: "{Wheat_22} Bu winter wheat in 2022."
                 },
                 renderer: {
                     type: "class-breaks",
-                    field: "Wheat",
+                    field: "Wheat_22",
                     legendOptions: {
                         title: "Wheat production (Bu), 2022"
                     },
@@ -302,7 +419,63 @@
                     }]
                 }
             });
-            wheatMap.add(wheat_map);
+            const wheat_map_21 = new GeoJSONLayer({
+                copyright: "USDA",
+                url: "https://dl.dropbox.com/scl/fi/n8z1k9nkcobbig74nhwzu/dataset.json?rlkey=nrgjo3tdzga8hethmkac8iayo&dl=0",
+                title: "Winter wheat production 2021",
+                outFields: ["County", "Wheat_21"],
+                popupTemplate: {
+                    title: "{County}",
+                    content: "{Wheat_21} Bu winter wheat in 2021."
+                },
+                renderer: {
+                    type: "class-breaks",
+                    field: "Wheat_21",
+                    legendOptions: {
+                        title: "Wheat production (Bu), 2021"
+                    },
+                    defaultSymbol: {
+                        type: "simple-fill",
+                        color: [255, 255, 255, 0.5],
+                        style: "backward-diagonal",
+                        outline: {
+                            width: 0.5,
+                            color: [255, 255, 255, 0.5]
+                        }
+                    },
+                    defaultLabel: "No data",
+                    classBreakInfos: [{
+                        minValue: 20600,
+                        maxValue: 239000,
+                        symbol: get_symbol("#ffd791"),
+                        label: "20,600 - 239,000"
+                    }, {
+                        minValue: 239001,
+                        maxValue: 653000,
+                        symbol: get_symbol("#9f7833"),
+                        label: "239,001 - 653,000"
+                    }, {
+                        minValue: 653001,
+                        maxValue: 1527000,
+                        symbol: get_symbol("#9c6615"),
+                        label: "653,001 - 1,527,000"
+                    }, {
+                        minValue: 1527001,
+                        maxValue: 2652000,
+                        symbol: get_symbol("#691e06"),
+                        label: "1,527,001 - 2,652,000"
+                    }]
+                }
+            });
+            wheatMap.add(wheat_map_22);
+            wheatMap.add(wheat_map_21);
+            const wheatSwipe = new Swipe({
+                leadingLayers: [wheat_map_21],
+                trailingLayers: [wheat_map_22],
+                position: 30,
+                view: wheat_view
+            });
+            wheat_view.ui.add(wheatSwipe);
 
             const temp_map = new Map({
                 basemap: "dark-gray"
@@ -322,7 +495,7 @@
                 title: "Average annual temperature (1975-2005)"
             });
             const t_county = new GeoJSONLayer({
-                url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
+                url: "https://dl.dropbox.com/scl/fi/n8z1k9nkcobbig74nhwzu/dataset.json?rlkey=nrgjo3tdzga8hethmkac8iayo&dl=0",
                 title: "Counties",
                 popupTemplate: {
                     title: "{County}"
@@ -352,12 +525,12 @@
                 view: pre_view
             });
             pre_view.ui.add(scalebar5, { position: "bottom-left" });
-            const p_map = new ImageryLayer ({
+            const p_map = new ImageryLayer({
                 url: "https://apps.fs.usda.gov/fsgisx01/rest/services/RDW_Climate/AvgAnnualPrecipHistorical1975_2005_CONUS/ImageServer",
                 title: "Average annual precipitation (1975-2005)"
             });
             const p_county = new GeoJSONLayer({
-                url: "https://dl.dropbox.com/scl/fi/w4lccg9ef26ycsd6hk81f/dataset.json?rlkey=rb1cap9mg7fw0x05pnkdkw4at&dl=0",
+                url: "https://dl.dropbox.com/scl/fi/n8z1k9nkcobbig74nhwzu/dataset.json?rlkey=nrgjo3tdzga8hethmkac8iayo&dl=0",
                 title: "Counties",
                 popupTemplate: {
                     title: "{County}"
